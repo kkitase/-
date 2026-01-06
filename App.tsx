@@ -3,6 +3,8 @@ import { Camera, Plus, Receipt } from 'lucide-react';
 import { Expense, LoadingState, ReceiptData } from './types';
 import { geminiService } from './services/geminiService';
 import SummaryCard from './components/SummaryCard';
+import ComparisonCard from './components/ComparisonCard';
+import CalendarView from './components/CalendarView';
 import ExpenseList from './components/ExpenseList';
 import LoadingOverlay from './components/LoadingOverlay';
 import EditModal from './components/EditModal';
@@ -12,7 +14,7 @@ const App: React.FC = () => {
     const saved = localStorage.getItem('expenses');
     return saved ? JSON.parse(saved) : [];
   });
-  
+
   const [loadingState, setLoadingState] = useState<LoadingState>('idle');
   const [scannedData, setScannedData] = useState<ReceiptData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,7 +57,7 @@ const App: React.FC = () => {
       ...data,
       createdAt: Date.now()
     };
-    
+
     setExpenses(prev => [newExpense, ...prev]);
     setIsModalOpen(false);
     setScannedData(null);
@@ -63,7 +65,7 @@ const App: React.FC = () => {
 
   const handleDeleteExpense = (id: string) => {
     if (window.confirm('この記録を削除してもよろしいですか？')) {
-        setExpenses(prev => prev.filter(e => e.id !== id));
+      setExpenses(prev => prev.filter(e => e.id !== id));
     }
   };
 
@@ -74,8 +76,8 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-safe">
       <LoadingOverlay isVisible={loadingState === 'analyzing'} />
-      
-      <EditModal 
+
+      <EditModal
         isOpen={isModalOpen}
         initialData={scannedData}
         onClose={() => setIsModalOpen(false)}
@@ -85,17 +87,18 @@ const App: React.FC = () => {
       <header className="bg-white border-b border-gray-100 sticky top-0 z-20">
         <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-             <div className="bg-primary-500 p-1.5 rounded-lg text-white">
-                <Receipt className="w-4 h-4" />
-             </div>
-             <h1 className="text-lg font-bold text-navy-900 tracking-tight">スナップ家計簿</h1>
+            <div className="bg-primary-500 p-1.5 rounded-lg text-white">
+              <Receipt className="w-4 h-4" />
+            </div>
+            <h1 className="text-lg font-bold text-navy-900 tracking-tight">スナップ家計簿</h1>
           </div>
         </div>
       </header>
 
       <main className="max-w-md mx-auto p-4 space-y-6">
         <SummaryCard expenses={expenses} />
-        
+        <ComparisonCard expenses={expenses} />
+        <CalendarView expenses={expenses} />
         <ExpenseList expenses={expenses} onDelete={handleDeleteExpense} />
       </main>
 
@@ -118,7 +121,7 @@ const App: React.FC = () => {
           onChange={handleFileChange}
         />
       </div>
-      
+
       {/* Bottom spacer for FAB */}
       <div className="h-20"></div>
     </div>
